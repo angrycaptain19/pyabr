@@ -226,7 +226,7 @@ class MainApp(QMainWindow):
     def init_map(self):
         # Add positions to the map
         for x in range(0, self.b_size):
-            for y in range(0, self.b_size):
+            for y in range(self.b_size):
                 w = Pos(x, y)
                 self.grid.addWidget(w, y, x)
                 # Connect signal to handle expansion.
@@ -252,9 +252,7 @@ class MainApp(QMainWindow):
 
         def get_adjacency_n(x, y):
             positions = self.get_surrounding(x, y)
-            n_mines = sum(1 if w.is_mine else 0 for w in positions)
-
-            return n_mines
+            return sum(1 if w.is_mine else 0 for w in positions)
 
         # Add adjacencies to the positions
         for x in range(0, self.b_size):
@@ -297,7 +295,7 @@ class MainApp(QMainWindow):
 
     def reveal_map(self):
         for x in range(0, self.b_size):
-            for y in range(0, self.b_size):
+            for y in range(self.b_size):
                 w = self.grid.itemAtPosition(y, x).widget()
                 w.reveal()
 

@@ -32,7 +32,7 @@ class FileListView(QListView):
             format = max(format)
             if it.whatsThis().endswith(format):
                 logo = control.read_record(format + '.icon', '/etc/ext')
-                if not logo == None:
+                if logo is not None:
                     it.setIcon(QIcon(res.get(logo)))
                 else:
                     it.setIcon(QIcon(res.get(res.etc('roller','file-icon'))))
@@ -372,13 +372,10 @@ class MainApp (QMainWindow):
     def inp(self):
         if self.mode=='select':
             inputx = files.readall('/proc/info/dsel')
-            self.External[2](inputx)
-        elif self.mode=='save' or self.mode=='save-as':
+        elif self.mode in ['save', 'save-as']:
             self.leSave.setPlaceholderText(res.get('@string/fn'))
             inputx = files.readall('/proc/info/dsel')+'/'+self.leSave.text()
-            self.External[2](inputx)
         else:
             inputx = files.readall('/proc/info/fsel')
-            self.External[2](inputx)
-
+        self.External[2](inputx)
         self.Widget.Close()

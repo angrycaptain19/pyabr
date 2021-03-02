@@ -79,7 +79,7 @@ class MainApp (QMainWindow):
         self.typcial = self.External[0]
         self.username = self.External[1]
 
-        if self.username==None: self.Widget.Close()
+        if self.username is None: self.Widget.Close()
 
         if self.typcial=='edit':
             first_name = control.read_record('first_name',f'/etc/users/{self.username}')
@@ -94,26 +94,26 @@ class MainApp (QMainWindow):
             s = QDateEdit()
             s.setDate(QDate(2020,2,2))
 
-            if not first_name==None:
+            if first_name is not None:
                 self.leFirstName.setText(first_name)
-            if not last_name==None:
+            if last_name is not None:
                 self.leLastName.setText(last_name)
-            if not company==None:
+            if company is not None:
                 self.leCompany.setText(company)
-            if not email==None:
+            if email is not None:
                 self.leEmail.setText(email)
-            if not phone==None:
+            if phone is not None:
                 self.lePhone.setText(phone)
-            if not gender==None:
+            if gender is not None:
                 self.cbGender.setCurrentText(gender)
-            if not birthday==None:
+            if birthday is not None:
                 birthday = birthday.split('-')
                 year = int(birthday[0])
                 month = int(birthday[1])
                 day = int(birthday[2])
 
                 self.leBirthday.setDate(QDate(year,month,day))
-            if not bloodtype==None:
+            if bloodtype is not None:
                 self.cbBloodtype.setCurrentText(bloodtype)
 
             self.btnSave.clicked.connect (self.edit_)

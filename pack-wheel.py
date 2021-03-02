@@ -50,8 +50,8 @@ shutil.copyfile('LICENSE','wheel/setup/LICENSE')
 shutil.copyfile('README.md','wheel/setup/README.md')
 shutil.copyfile('wheel/setup-pack.py','wheel/setup/setup.py')
 shutil.copyfile('wheel/setup-installer.py','wheel/setup/pyabr/setup.py')
-file = open ("wheel/setup/pyabr/__main__.py","w");file.write('from pyabr import setup');file.close()
-
+with open ("wheel/setup/pyabr/__main__.py","w") as file:
+    file.write('from pyabr import setup')
 ## Pack src to setup ##
 shutil.make_archive('wheel/setup/pyabr/pyabr','zip','wheel/src')
 

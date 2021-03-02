@@ -51,12 +51,9 @@ class MainApp (QMainWindow):
         self.lblText.setFont(self.Env.font())
         self.layout().addWidget(self.lblText)
 
-        if self.External[0]=='' or self.External[0]==None:
+        if self.External[0] == '' or self.External[0] is None:
             self.Widget.SetWindowTitle (res.get('@string/title'))
-        elif self.External[1]=='' or self.External[1]==None:
-            self.lblText.setText(res.get('@string/text'))
-        elif (self.External[1]=='' or self.External[1]==None) and (self.External[0]=='' or self.External[0]==None):
-            self.Widget.SetWindowTitle(res.get('@string/title'))
+        elif self.External[1] == '' or self.External[1] is None:
             self.lblText.setText(res.get('@string/text'))
         else:
             self.lblText.setText(self.External[1])

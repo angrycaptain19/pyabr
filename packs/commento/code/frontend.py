@@ -148,9 +148,7 @@ class TerminalWidget(QWidget):
 
         
     def focusNextPrevChild(self, next):
-        if not self._session.is_alive():
-            return True
-        return False
+        return not self._session.is_alive()
 
 
     def focusInEvent(self, event):
@@ -259,10 +257,7 @@ class TerminalWidget(QWidget):
 
 
     def _paint_cursor(self, painter):
-        if self._blink:
-            color = "#aaa"
-        else:
-            color = "#fff"
+        color = "#aaa" if self._blink else "#fff"
         painter.setPen(QPen(QColor(color)))
         painter.drawRect(self._cursor_rect)
 
@@ -430,12 +425,10 @@ class TerminalWidget(QWidget):
     def text(self, rect=None):
         if rect is None:
             return "\n".join(self._text)
-        else:
-            text = []
-            (start_col, start_row, end_col, end_row) = rect
-            for row in range(start_row, end_row):
-                text.append(self._text[row][start_col:end_col])
-            return text
+        (start_col, start_row, end_col, end_row) = rect
+        return [
+            self._text[row][start_col:end_col] for row in range(start_row, end_row)
+        ]
 
         
     def text_selection(self):

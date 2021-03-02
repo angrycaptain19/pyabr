@@ -43,7 +43,7 @@ class MainApp(QMainWindow):
         if self.External==[]:
             self.add_new_tab(QUrl(URL), res.get('@string/app_name'))
         else:
-            if self.External[0]==None:
+            if self.External[0] is None:
                 self.add_new_tab(QUrl(URL), res.get('@string/app_name'))
             else:
                 if self.External[0].startswith ('http://') or self.External[0].startswith ('https://'):
@@ -70,34 +70,26 @@ class MainApp(QMainWindow):
 
                     self.domain = revspl[1]+"."+revspl[0]
 
-                    package = ''
-                    for i in revspl:
-                        package+='/'+i
-
+                    package = ''.join('/'+i for i in revspl)
                     if not files.isdir(f'/srv/{revspl[0]}/{revspl[1]}'):
                         result = subprocess.check_output(f'"{sys.executable}" {files.readall("/proc/info/boot")} exec /srv/com/pyabr/error/DomainNotExists', shell=True)
                         html = result.decode('utf-8')
-                        self.abr(html)
                     else:
                         if files.isfile(f'/srv/{package}/{filename}.py') or files.isfile(f'/srv/{package}/{filename}.sa') or files.isfile(f'/srv/{package}/{filename}') or files.isfile(f'/srv/{package}/{filename}.exe') or files.isfile(f'/srv/{package}/{filename}.jar'):
                             result = subprocess.check_output(f'"{sys.executable}" {files.readall("/proc/info/boot")} exec /srv/{package}/{filename}',shell=True)
                             html = result.decode('utf-8')
-                            self.abr(html)
                         elif files.isfile(f'/srv/{package}/{filename}.html'):
                             html = files.readall(f'/srv/{package}/{filename}.html')
-                            self.abr(html)
                         elif files.isfile(f'/srv/{package}/{filename}.xhtml'):
                             html = files.readall(f'/srv/{package}/{filename}.xhtml')
-                            self.abr(html)
                         elif files.isfile(f'/srv/{package}/{filename}.xml'):
                             html = files.readall(f'/srv/{package}/{filename}.xml')
-                            self.abr(html)
                         else:
                             result = subprocess.check_output(
                                 f'"{sys.executable}" {files.readall("/proc/info/boot")} exec /srv/com/pyabr/error/PageNotFound',
                                 shell=True)
                             html = result.decode('utf-8')
-                            self.abr(html)
+                    self.abr(html)
                 else:
                     result = subprocess.check_output(
                         f'"{sys.executable}" {files.readall("/proc/info/boot")} exec /srv/com/pyabr/error/InvalidURL',

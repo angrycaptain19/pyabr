@@ -71,11 +71,8 @@ elif option=="upak":
 
     archive = sys.argv[2:]
 
-    if not archive[1:]==[]:
-        strv = ''
-        for i in archive:
-            strv+=','+i
-
+    if archive[1:] != []:
+        strv = ''.join(','+i for i in archive)
     for i in archive:
         if files.isfile(i):
             print (f'Unpacking \'{i}\' archive package ...')
@@ -100,11 +97,8 @@ elif option=="rm":
 
     list = control.read_list('/etc/paye/permanetly_applications')
 
-    if not package[1:] == []:
-        strv = ''
-        for i in package:
-            strv += ',' + i
-
+    if package[1:] != []:
+        strv = ''.join(',' + i for i in package)
     for i in package:
         if not i in list:
             print (f"Uninstalling {i} package ... ")
@@ -122,10 +116,8 @@ elif option=="get":
 
     package = sys.argv[2:]
 
-    if not package[1:] == []:
-        strv = ''
-        for i in package:
-            strv += ',' + i
+    if package[1:] != []:
+        strv = ''.join(',' + i for i in package)
     for i in package:
         print (f'Downloading {i} archive package ... ')
         pack.download (i.lower())
@@ -152,7 +144,7 @@ elif option=="in":
         if files.isfile(f'/app/packages/{i.lower()}.manifest'):
             old = control.read_record('version', f'/app/packages/{i}.manifest')
             new = control.read_record('version', f'/app/mirrors/{i}.manifest')
-            if not i=='latest' and old == new and not i == 'stable':
+            if i != 'latest' and old == new and i != 'stable':
                 colors.show('paye','warning',f'{i}: package is up to date.')
             else:
                 print(f'Downloading {i} archive package ... ')
@@ -165,9 +157,7 @@ elif option=="in":
         if files.isfile(f'/app/packages/{j.lower()}.manifest'):
             old = control.read_record('version', f'/app/packages/{j}.manifest')
             new = control.read_record('version', f'/app/mirrors/{j}.manifest')
-            if not i=='latest' and old == new:
-                pass
-            else:
+            if i == 'latest' or old != new:
                 print(f'Installing {i} archive package ... ')
                 pack.unpack("/app/cache/gets/" + j.lower() + ".pa")
         else:
@@ -194,21 +184,21 @@ elif option=="info":
         copyright = control.read_record("copyright", pack)
 
         bold = colors.color(1, colors.get_bgcolor(), colors.get_fgcolor())
-        if not (name == None or name == ""):  print(
+        if name is not None and name != "":  print(
             "\t      Package name: " + bold + name + colors.get_colors())
-        if not (version == None or version == ""):  print(
+        if version is not None and version != "":  print(
             "\t   Package version: " + bold + version + colors.get_colors())
-        if not (build == None or build == ""):  print(
+        if build is not None and build != "":  print(
             "\t        Build date: " + bold + build + colors.get_colors())
-        if not (copyright == None or copyright == ""):  print(
+        if copyright is not None and copyright != "":  print(
             "\t         Copyright: " + bold + copyright + colors.get_colors())
-        if not (license == None or license == ""):  print(
+        if license is not None and license != "":  print(
             "\t          Licensce: " + bold + license + colors.get_colors())
-        if not (description == None or description == ""):  print(
+        if not (description is None or description == ""):  print(
             "\t       Description: " + bold + description + colors.get_colors())
-        if not (depends == None or depends == ""):  print(
+        if not (depends is None or depends == ""):  print(
             "\t   Package depends: " + bold + depends + colors.get_colors())
-        if not (unpack == None or unpack == ""):  print(
+        if unpack is not None and unpack != "":  print(
             "\t      Installed in: " + bold + unpack + colors.get_colors())
     else:
         colors.show ("paye","fail",sys.argv[2]+": package has not already installed.")
@@ -271,11 +261,7 @@ elif option=='crt':
 
     crtype = sys.argv[2]
 
-    if sys.argv[3:]==[]:
-        crname = 'untitled'
-    else:
-        crname = sys.argv[3]
-
+    crname = 'untitled' if sys.argv[3:]==[] else sys.argv[3]
     if not files.isdir(crname):
         files.mkdir(crname)
 

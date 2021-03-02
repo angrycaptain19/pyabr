@@ -44,7 +44,7 @@ class AboutDialog(QDialog):
         layout.addWidget(QLabel("Version 23.35.211.233232"))
         layout.addWidget(QLabel("Copyright 2015 Mozarella Inc."))
 
-        for i in range(0, layout.count()):
+        for i in range(layout.count()):
             layout.itemAt(i).setAlignment(Qt.AlignHCenter)
 
         layout.addWidget(self.buttonBox)
@@ -248,11 +248,9 @@ class MainApp(QMainWindow):
         if q.scheme() == 'https':
             # Secure padlock icon
             img = res.get('@icon/lock-ssl')
-            self.httpsicon.setPixmap(QPixmap(img))
         else:
             # Insecure padlock icon
             img = res.get('@icon/lock-nossl')
-            self.httpsicon.setPixmap(QPixmap(img))
-
+        self.httpsicon.setPixmap(QPixmap(img))
         self.urlbar.setText(q.toString())
         self.urlbar.setCursorPosition(0)

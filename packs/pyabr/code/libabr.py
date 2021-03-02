@@ -12,10 +12,9 @@
 
 import importlib, shutil, os, sys, hashlib, subprocess,time,datetime,getpass,py_compile,socket
 
-def read_record (name,filename):
-    file = open (filename,"r")
-    strv = file.read()
-    file.close()
+def read_record(name,filename):
+    with open (filename,"r") as file:
+        strv = file.read()
     strv = strv.split("\n")
 
     for i in strv:
@@ -24,24 +23,21 @@ def read_record (name,filename):
             if i[0]==(name):
                 return i[1]
 
-def read_list (filename):
-    file = open (filename,"r")
-    strv = file.read()
-    file.close()
+def read_list(filename):
+    with open (filename,"r") as file:
+        strv = file.read()
     strv = strv.split("\n")
     return strv
 
 def write_record(name, value, filename):
-    file = open (filename,'r')
-    all = file.read()
-    file.close()
+    with open (filename,'r') as file:
+        all = file.read()
     record = read_record(name, filename)
     os.remove(filename)
-    if not (record == None):
+    if record is not None:
         all = all.replace("\n"+name + ": " + record, "")
-    file = open(filename,'w')
-    file.write(all + "\n" + name + ": " + value)
-    file.close()
+    with open(filename,'w') as file:
+        file.write(all + "\n" + name + ": " + value)
 
 # script #
 class Script:
@@ -63,7 +59,7 @@ class Script:
         k = 0
 
         for cmd in cmdall:
-            k = k + 1
+            k += 1
             ## Create cmdln with variables ##
 
             cmdln = cmd.split(" ")
@@ -74,10 +70,7 @@ class Script:
                 if str(i).startswith("$"):
                     select = files.readall("/proc/info/sel")
                     var = control.read_record(str(i).replace("$", ""), select)
-                    if var == None:
-                        strcmdln = strcmdln + " " + i
-                    else:
-                        strcmdln = strcmdln + " " + var
+                    strcmdln = strcmdln + " " + i if var is None else strcmdln + " " + var
                 else:
                     strcmdln = strcmdln + " " + i
 
@@ -135,25 +128,25 @@ class Commands:
                     self.set([s[0]+":",s[1]])
 
     # enc is a encriptor #
-    def uenc (self,args):
+    def uenc(self,args):
         files = Files()
         colors = Colors()
         for i in args:
             src = files.readall (i)
             #header = f'{magic},{version},{type},{security},{password},{filename},'
             split = src.split(',')
-            if not split[0]=='BA':
+            if split[0] != 'BA':
                 colors.show ('enc','fail',f'{i}: is not a binary application file.')
                 sys.exit(0)
 
-            if not split[5]==hashlib.sha3_512(files.output(i).encode()).hexdigest():
+            if split[5] != hashlib.sha3_512(files.output(i).encode()).hexdigest():
                 colors.show('enc', 'fail', f'{i}: is not a real file name.')
                 sys.exit(0)
 
             if split[3]=='\x01':
                 password = getpass.getpass('Enter a password: ')
                 hashcode = hashlib.sha3_512(password.encode()).hexdigest()
-                if not hashcode==split[4]:
+                if hashcode != split[4]:
                     colors.show('enc', 'fail', f'{i}: wrong password.')
                     sys.exit(0)
 
@@ -249,19 +242,19 @@ class Commands:
                         .replace( '\x9E','.')
             )
 
-    def enc (self,args):
+    def enc(self,args):
         files = Files()
         control = Control()
 
+        magic = 'BA'
         for i in args:
             src = files.readall (i)
-            magic = 'BA'
             version = control.read_record('version',files.readall('/proc/info/sel'))
-            if version==None: version='1'
+            if version is None: version='1'
 
             type = control.read_record('type', files.readall('/proc/info/sel'))
 
-            if type == None: type = '\x05'
+            if type is None: type = '\x05'
             else:
                 if type=='code': type = '\x01'
                 elif type=='message': type = '\x02'
@@ -270,14 +263,10 @@ class Commands:
                 else: type = '\x05'
 
             security = control.read_record('security', files.readall('/proc/info/sel'))
-            if security=='Yes':
-                security = '\x01'
-            else:
-                security = '\x02'
-
+            security = '\x01' if security=='Yes' else '\x02'
             password = control.read_record('password', files.readall('/proc/info/sel'))
 
-            if not password == None:
+            if password is not None:
                 password = hashlib.sha3_512(password.encode()).hexdigest()
             else:
                 password = hashlib.sha3_512(''.encode()).hexdigest()
@@ -378,7 +367,7 @@ class Commands:
                         .replace('.','\x9E')
             )
     # zip #
-    def zip (self, args):
+    def zip(self, args):
         files = Files()
         control = Control()
         permissions = Permissions()
@@ -390,11 +379,7 @@ class Commands:
 
         src = args[0]
 
-        if args[1:]==[]:
-            dest = src
-        else:
-            dest = args[1]
-
+        dest = src if args[1:]==[] else args[1]
         if not files.isdir (src):
             colors.show('zip', 'fail', f'{src}: source directory not found.')
             sys.exit(0)
@@ -413,7 +398,7 @@ class Commands:
             sys.exit(0)
 
     # zip #
-    def tar (self, args):
+    def tar(self, args):
         files = Files()
         control = Control()
         permissions = Permissions()
@@ -425,11 +410,7 @@ class Commands:
 
         src = args[0]
 
-        if args[1:]==[]:
-            dest = src
-        else:
-            dest = args[1]
-
+        dest = src if args[1:]==[] else args[1]
         if not files.isdir (src):
             colors.show('tar', 'fail', f'{src}: source directory not found.')
             sys.exit(0)
@@ -453,7 +434,7 @@ class Commands:
         print (files.readall('/proc/info/pwd'))
 
     # zip #
-    def xzip (self, args):
+    def xzip(self, args):
         files = Files()
         control = Control()
         permissions = Permissions()
@@ -465,11 +446,7 @@ class Commands:
 
         src = args[0]
 
-        if args[1:]==[]:
-            dest = src
-        else:
-            dest = args[1]
-
+        dest = src if args[1:]==[] else args[1]
         if not files.isdir (src):
             colors.show('xzip', 'fail', f'{src}: source directory not found.')
             sys.exit(0)
@@ -488,7 +465,7 @@ class Commands:
             sys.exit(0)
 
     # zip #
-    def gzip (self, args):
+    def gzip(self, args):
         files = Files()
         control = Control()
         permissions = Permissions()
@@ -500,11 +477,7 @@ class Commands:
 
         src = args[0]
 
-        if args[1:]==[]:
-            dest = src
-        else:
-            dest = args[1]
-
+        dest = src if args[1:]==[] else args[1]
         if not files.isdir (src):
             colors.show('gzip', 'fail', f'{src}: source directory not found.')
             sys.exit(0)
@@ -523,7 +496,7 @@ class Commands:
             sys.exit(0)
 
     # zip #
-    def bzip (self, args):
+    def bzip(self, args):
         files = Files()
         control = Control()
         permissions = Permissions()
@@ -535,11 +508,7 @@ class Commands:
 
         src = args[0]
 
-        if args[1:]==[]:
-            dest = src
-        else:
-            dest = args[1]
-
+        dest = src if args[1:]==[] else args[1]
         if not files.isdir (src):
             colors.show('bzip', 'fail', f'{src}: source directory not found.')
             sys.exit(0)
@@ -557,7 +526,7 @@ class Commands:
             colors.show('bzip', 'perm', '')
             sys.exit(0)
 
-    def unzip (self,args):
+    def unzip(self,args):
         files = Files()
         control = Control()
         permissions = Permissions()
@@ -569,11 +538,7 @@ class Commands:
 
         src = args[0]
 
-        if args[1:]==[]:
-            dest = src
-        else:
-            dest = args[1]
-
+        dest = src if args[1:]==[] else args[1]
         if not files.isfile (src):
             colors.show('unzip', 'fail', f'{src}: source archive not found.')
             sys.exit(0)
@@ -588,7 +553,7 @@ class Commands:
             colors.show('unzip', 'perm', '')
             sys.exit(0)
 
-    def xunzip (self, args):
+    def xunzip(self, args):
         files = Files()
         control = Control()
         permissions = Permissions()
@@ -600,11 +565,7 @@ class Commands:
 
         src = args[0]
 
-        if args[1:] == []:
-            dest = src
-        else:
-            dest = args[1]
-
+        dest = src if args[1:] == [] else args[1]
         if not files.isfile(src):
             colors.show('xunzip', 'fail', f'{src}: source archive not found.')
             sys.exit(0)
@@ -632,11 +593,7 @@ class Commands:
 
         src = args[0]
 
-        if args[1:] == []:
-            dest = src
-        else:
-            dest = args[1]
-
+        dest = src if args[1:] == [] else args[1]
         if not files.isfile(src):
             colors.show('gunzip', 'fail', f'{src}: source archive not found.')
             sys.exit(0)
@@ -664,11 +621,7 @@ class Commands:
 
         src = args[0]
 
-        if args[1:] == []:
-            dest = src
-        else:
-            dest = args[1]
-
+        dest = src if args[1:] == [] else args[1]
         if not files.isfile(src):
             colors.show('bunzip', 'fail', f'{src}: source archive not found.')
             sys.exit(0)
@@ -696,11 +649,7 @@ class Commands:
 
         src = args[0]
 
-        if args[1:] == []:
-            dest = src
-        else:
-            dest = args[1]
-
+        dest = src if args[1:] == [] else args[1]
         if not files.isfile(src):
             colors.show('untar', 'fail', f'{src}: source archive not found.')
             sys.exit(0)
@@ -717,7 +666,7 @@ class Commands:
             sys.exit(0)
 
     # cc command #
-    def cc (self,args):
+    def cc(self,args):
         permissions = Permissions()
         files = Files()
         colors = Colors()
@@ -757,26 +706,8 @@ class Commands:
             type = 'java'
 
         # compile types #
-        if type=='python':
-            if args[1:]==[]:
-                py_compile.compile(files.input(filename),files.input(filename.replace('.py','.pyc')))
-                if not permissions.check(files.output(filename.replace('.py','.pyc')), "w", files.readall("/proc/info/su")):
-                    colors.show('cc', 'perm', '')
-                    sys.exit(0)
-            else:
-                output = args[1]
-                if not permissions.check(files.output(output), "w", files.readall("/proc/info/su")):
-                    colors.show('cc', 'perm', '')
-                    sys.exit(0)
-                py_compile.compile(files.input(filename), files.input(output))
-
-
-        elif type=='c':
-            if args[1:] == []:
-                output = filename.replace('.c','')
-            else:
-                output = args[1]
-
+        if type == 'c':
+            output = filename.replace('.c','') if args[1:] == [] else args[1]
             if not permissions.check(files.output(output), "w", files.readall("/proc/info/su")):
                 colors.show('cc', 'perm', '')
                 sys.exit(0)
@@ -788,7 +719,7 @@ class Commands:
             subprocess.call(strv)
 
 
-        elif type=='c++':
+        elif type == 'c++':
             if args[1:] == []:
                 output = filename.replace('.cpp','').replace('.cxx','').replace('.c++','')
             else:
@@ -802,12 +733,26 @@ class Commands:
                 "{dest}", files.input(output)).split (" ")
 
             subprocess.call(strv)
-        elif type=='java':
+        elif type == 'java':
             if not permissions.check(files.output(filename.replace('.java','.class')), "w", files.readall("/proc/info/su")):
                 colors.show('cc', 'perm', '')
                 sys.exit(0)
             strv = (control.read_record('class.java', '/etc/compiler').replace("{src}", files.input(filename).replace('.//',''))).split (' ')
             subprocess.call(strv)
+        elif type == 'python':
+            if args[1:]==[]:
+                py_compile.compile(files.input(filename),files.input(filename.replace('.py','.pyc')))
+                if not permissions.check(files.output(filename.replace('.py','.pyc')), "w", files.readall("/proc/info/su")):
+                    colors.show('cc', 'perm', '')
+                    sys.exit(0)
+            else:
+                output = args[1]
+                if not permissions.check(files.output(output), "w", files.readall("/proc/info/su")):
+                    colors.show('cc', 'perm', '')
+                    sys.exit(0)
+                py_compile.compile(files.input(filename), files.input(output))
+
+
         else:
             colors.show('cc','fail','not supported programing language.')
 
@@ -867,7 +812,7 @@ class Commands:
             colors.show("chmod", "perm", "")
 
     # chown #
-    def chown (self,args):
+    def chown(self,args):
         new_owner = args[0]
         name = args[1]
         permissions = Permissions()
@@ -886,11 +831,11 @@ class Commands:
 
         num = permissions.show_number(perm)
         num = str(num)
-        user_p = int(num[0])
-        others_p = int(num[1])
-        guest_p = int(num[2])
-
         if permowner == True:
+            user_p = int(num[0])
+            others_p = int(num[1])
+            guest_p = int(num[2])
+
             if new_owner == "":
                 permissions.create(files.output(name), user_p, others_p, guest_p, files.readall("/proc/info/su"))
             else:
@@ -1143,7 +1088,7 @@ class Commands:
                     colors.show("cat", "perm", "")
 
     # cd command #
-    def cd (self,args):
+    def cd(self,args):
         permissions = Permissions()
         files = Files()
         colors = Colors()
@@ -1163,10 +1108,7 @@ class Commands:
                 lens = len(pwd) - 1
                 pwd.pop(lens)
 
-                strv = ''
-
-                for i in pwd:
-                    strv += "/" + i
+                strv = ''.join("/" + i for i in pwd)
 
                 if strv.startswith('////'):
                     strv = strv.replace('////','/')
@@ -1337,7 +1279,7 @@ class Commands:
             self.set([i+":",input()])
 
     # ls command #
-    def ls (self,args):
+    def ls(self,args):
         modules = Modules()
         files = Files()
         control = Control()
@@ -1350,13 +1292,13 @@ class Commands:
 
         # check args #
 
-        if not args == [] and args[1:] == []:
+        if args != [] and args[1:] == []:
             path = files.output(args[0])
             options = ''
-        elif not args == [] and not args[1:] == []:
+        elif args != []:
             path = files.output(args[0])
             options = args[1]
-        elif args == []:
+        else:
             path = files.readall("/proc/info/pwd")
             options = ''
 
@@ -1526,7 +1468,7 @@ class Commands:
                 sys.exit(0)
 
     ## passwd ##
-    def passwd (self,args):
+    def passwd(self,args):
         modules = Modules()
         files = Files()
         control = Control()
@@ -1550,7 +1492,7 @@ class Commands:
         username = control.read_record('username','/etc/users/'+user)
         hashname = hashlib.sha3_256(user.encode()).hexdigest()
 
-        if not username==hashname:
+        if username != hashname:
             colors.show('passwd', 'fail', user + ": user not found.")
             sys.exit(0)
 
@@ -1560,7 +1502,7 @@ class Commands:
 
         oldcode = hashlib.sha3_512(getpass.getpass('Enter '+user+"'s old password: ").encode()).hexdigest()
 
-        if not code==oldcode:
+        if code != oldcode:
             colors.show('passwd', 'fail', user + ": wrong password.")
             sys.exit(0)
 
@@ -1699,7 +1641,7 @@ class Commands:
             colors.show("su", "fail", input_username + " user not found.")
 
     # sudo command #
-    def sudo (self,args):
+    def sudo(self,args):
         modules = Modules()
         files = Files()
         control = Control()
@@ -1723,7 +1665,7 @@ class Commands:
                 sys.exit(0)
 
             ## Check sudoers account ##
-            if not thisuser == "root":
+            if thisuser != "root":
                 sudoers = files.readall('/etc/sudoers')
 
                 if not sudoers.__contains__(thisuser):
@@ -1762,7 +1704,7 @@ class Commands:
             colors.show('sudo', 'fail', args[1] + ": option not found.")
 
     # uadd command #
-    def uadd (self,args):
+    def uadd(self,args):
         modules = Modules()
         files = Files()
         control = Control()
@@ -1822,7 +1764,7 @@ class Commands:
                     control.write_record("blood_type", blood_type, '/etc/users/' + input_username)
                 if not (phone == None or phone == ""):
                     control.write_record("phone", phone, '/etc/users/' + input_username)
-                if not (website == None or website == ""):
+                if not (website is None or website == ""):
                     control.write_record("website", website, '/etc/users/' + input_username)
                 if not (email == None or email == ""):
                     control.write_record("email", email, '/etc/users/' + input_username)

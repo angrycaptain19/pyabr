@@ -57,12 +57,8 @@ class PackageListView (QListView):
         namex = ''
 
         try:
-            if not (first_name == None and last_name == None):
+            if first_name is not None or last_name is not None:
                 namex = first_name + " " + last_name
-            elif not first_name == None:
-                namex = last_name
-            elif not last_name == None:
-                namex = first_name
             else:
                 namex = it.text()
         except:
@@ -72,7 +68,7 @@ class PackageListView (QListView):
 
         self.setIconSize(QSize(128,128))
 
-        if logo==None:
+        if logo is None:
             it.setIcon(QIcon(res.get('@icon/account')))
         else:
             it.setIcon(QIcon(res.get(logo)))
@@ -146,12 +142,8 @@ class ShowUserInformation (QMainWindow):
         last_name = control.read_record('last_name', self.path)
         logo = control.read_record('loginw.userlogo', self.path)
 
-        if not (first_name == None and last_name == None):
+        if first_name is not None or last_name is not None:
             namex = first_name + " " + last_name
-        elif not first_name == None:
-            namex = last_name
-        elif not last_name == None:
-            namex = first_name
         else:
             namex = 'Not set'
 
@@ -171,7 +163,7 @@ class ShowUserInformation (QMainWindow):
 
         if files.isfile (f'/etc/users/{self.External[0]}'):
             self.logo = control.read_record('loginw.userlogo',f'/etc/users/{self.External[0]}')
-            if not self.logo==None:
+            if self.logo is not None:
                 self.btnImage.setIcon(QIcon(res.get(self.logo)))
             else:
                 self.btnImage.setIcon(QIcon(res.get('@icon/account')))
@@ -252,37 +244,37 @@ class ShowUserInformation (QMainWindow):
         self.text2 = QTextBrowser()
         self.text2.setFont(self.Env.font())
         self.text2.append(f'\n{self.External[0]}\n')
-        if not self.fullname=='Not set':
+        if self.fullname != 'Not set':
             self.text2.append(self.fullname + "\n")
         else:
             self.text2.append(f'<font color="gray">{nots}</font><br/><br/>')
 
-        if not self.company == None:
+        if self.company is not None:
             self.text2.append(self.company + "\n")
         else:
             self.text2.append(f'<font color="gray">{nots}</font><br/><br/>')
 
-        if not self.email == None:
+        if self.email is not None:
             self.text2.append(self.email + "\n")
         else:
             self.text2.append(f'<font color="gray">{nots}</font><br/><br/>')
 
-        if not self.phone == None:
+        if self.phone is not None:
             self.text2.append(self.phone + "\n")
         else:
             self.text2.append(f'<font color="gray">{nots}</font><br/><br/>')
 
-        if not self.gender == None:
+        if self.gender is not None:
             self.text2.append(self.gender + "\n")
         else:
             self.text2.append(f'<font color="gray">{nots}</font><br/><br/>')
 
-        if not self.birthday == None:
+        if self.birthday is not None:
             self.text2.append(self.birthday + "\n")
         else:
             self.text2.append(f'<font color="gray">{nots}</font><br/><br/>')
 
-        if not self.blood_type == None:
+        if self.blood_type is not None:
             self.text2.append(self.blood_type + "\n")
         else:
             self.text2.append(f'<font color="gray">{nots}</font><br/><br/>')

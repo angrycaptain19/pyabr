@@ -11,10 +11,9 @@
 #######################################################################################
 import os
 
-def read_record (name,filename):
-    file = open (filename,"r")
-    strv = file.read()
-    file.close()
+def read_record(name,filename):
+    with open (filename,"r") as file:
+        strv = file.read()
     strv = strv.split("\n")
 
     for i in strv:
@@ -23,21 +22,18 @@ def read_record (name,filename):
             if i[0]==(name):
                 return i[1]
 
-def read_list (filename):
-    file = open (filename,"r")
-    strv = file.read()
-    file.close()
+def read_list(filename):
+    with open (filename,"r") as file:
+        strv = file.read()
     strv = strv.split("\n")
     return strv
 
 def write_record(name, value, filename):
-    file = open (filename,'r')
-    all = file.read()
-    file.close()
+    with open (filename,'r') as file:
+        all = file.read()
     record = read_record(name, filename)
     os.remove(filename)
-    if not (record == None):
+    if record is not None:
         all = all.replace("\n"+name + ": " + record, "")
-    file = open(filename,'w')
-    file.write(all + "\n" + name + ": " + value)
-    file.close()
+    with open(filename,'w') as file:
+        file.write(all + "\n" + name + ": " + value)

@@ -81,10 +81,7 @@ def level(scr, spd):
 
 
 def check_collision(enemy_list, player_pos):
-    for enemy in enemy_list:
-        if collision(enemy, player_pos):
-            return True
-    return False
+    return any(collision(enemy, player_pos) for enemy in enemy_list)
 
 
 def game_opening():
@@ -139,10 +136,8 @@ while not game_over:
         time.sleep(3)
         game_over = True
         break
-    if p_pos[0] <= 0:
-        p_pos[0] = 0
-    if p_pos[0] >= 740:
-        p_pos[0] = 740
+    p_pos[0] = max(p_pos[0], 0)
+    p_pos[0] = min(p_pos[0], 740)
     # if (e_pos[1] >= 0) and (e_pos[1] <= 600):
     #     e_pos[1] += speed_e
     # else:
@@ -155,7 +150,7 @@ while not game_over:
     t_s = font.render("score : " + str(score), True, (0, 255, 0))
     win.blit(t_s, (20, 20))
     speed_e = level(score, speed_e)
- 
+
     img1 = pygame.image.load(res.get("@icon/catball"))
     img1 = pygame.transform.scale(img1, (60, 60))
     win.blit(img1, (p_pos[0], p_pos[1], 60, 60))

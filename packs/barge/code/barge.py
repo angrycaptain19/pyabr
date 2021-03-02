@@ -134,7 +134,7 @@ class MainApp(QtWidgets.QMainWindow):
 
     def run_(self):
         control = Control()
-        if not self.Widget.WindowTitle()==res.get('@string/untitled'):
+        if self.Widget.WindowTitle() != res.get('@string/untitled'):
             self.save_('')
         else:
             self.save_as()
@@ -204,7 +204,7 @@ pause
             self.Env.RunApp('commento', [None])
             app.switch('barge')
         else:
-            if not self.Widget.WindowTitle()==res.get('@string/untitled'):
+            if self.Widget.WindowTitle() != res.get('@string/untitled'):
                 app.switch('barge')
                 self.Env.RunApp('text', [res.get('@string/cs'), res.get('@string/csm')])
                 app.switch('barge')
@@ -228,8 +228,8 @@ pause
         files.write(filename,self.teEdit.toPlainText())
         self.Widget.SetWindowTitle(files.output(filename))
 
-    def save_ (self,filename):
-        if not self.Widget.WindowTitle()==res.get('@string/untitled'):
+    def save_(self,filename):
+        if self.Widget.WindowTitle() != res.get('@string/untitled'):
             files.write(files.output(self.Widget.WindowTitle()),self.teEdit.toPlainText())
         else:
             app.switch('barge')

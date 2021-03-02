@@ -474,10 +474,7 @@ class Terminal(object):
             elif m == '?3':
                 # Column mode
                 if self.vt100_mode_column_switch:
-                    if state:
-                        self.w = 132
-                    else:
-                        self.w = 80
+                    self.w = 132 if state else 80
                     self.reset_screen()
             elif m == '?5':
                 # Screen mode
@@ -572,14 +569,15 @@ class Terminal(object):
 
     def esc_DECSC(self):
         # Store cursor
-        self.vt100_saved = {}
-        self.vt100_saved['cx'] = self.cx
-        self.vt100_saved['cy'] = self.cy
-        self.vt100_saved['attr'] = self.attr
-        self.vt100_saved['charset_g_sel'] = self.vt100_charset_g_sel
-        self.vt100_saved['charset_g'] = self.vt100_charset_g[:]
-        self.vt100_saved['mode_autowrap'] = self.vt100_mode_autowrap
-        self.vt100_saved['mode_origin'] = self.vt100_mode_origin
+        self.vt100_saved = {
+            'cx': self.cx,
+            'cy': self.cy,
+            'attr': self.attr,
+            'charset_g_sel': self.vt100_charset_g_sel,
+            'charset_g': self.vt100_charset_g[self],
+            'mode_autowrap': self.vt100_mode_autowrap,
+            'mode_origin': self.vt100_mode_origin,
+        }
 
 
     def esc_DECRC(self):
@@ -852,7 +850,7 @@ class Terminal(object):
         p = self.vt100_parse_params(p, ['0'], False)
         if p[0] == '0':
             self.vt100_out = "\x1b[?1;2c"
-        elif p[0] == '>0' or p[0] == '>':
+        elif p[0] in ['>0', '>']:
             self.vt100_out = "\x1b[>0;184;0c"
 
 
@@ -1074,7 +1072,7 @@ class Terminal(object):
                 self.vt100_parse_reset()
             else:
                 if char < 32:
-                    if char == 24 or char == 26:
+                    if char in [24, 26]:
                         self.vt100_parse_reset()
                         return True
                 else:
@@ -1145,10 +1143,7 @@ class Terminal(object):
             elif c == '~':
                 self.vt100_keyfilter_escape = True
             elif char == 127:
-                if self.vt100_mode_backspace:
-                    o += chr(8)
-                else:
-                    o += chr(127)
+                o += chr(8) if self.vt100_mode_backspace else chr(127)
             else:
                 o += c
                 if self.vt100_mode_lfnewline and char == 13:
@@ -1160,10 +1155,10 @@ class Terminal(object):
         screen = []
         attr_ = -1
         cx, cy = min(self.cx, self.w - 1), self.cy
-        for y in range(0, self.h):
+        for y in range(self.h):
             wx = 0
             line = [""]
-            for x in range(0, self.w):
+            for x in range(self.w):
                 d = self.screen[y * self.w + x]
                 char = d & 0xffff
                 attr = d >> 16
@@ -1185,10 +1180,7 @@ class Terminal(object):
                     if attr & 0x0400:
                         fg = 0xc
                     # Underline
-                    if attr & 0x0100:
-                        ul = True
-                    else:
-                        ul = False
+                    ul = bool(attr & 0x0100)
                     line.append((fg, bg, ul))
                     line.append("")
                     attr_ = attr
@@ -1264,7 +1256,7 @@ class Multiplexer(object):
 
     @synchronized
     def proc_keepalive(self, sid, w, h, cmd=None):
-        if not sid in self.session:
+        if sid not in self.session:
             # Start a new session
             self.session[sid] = {
                 'state':'unborn',
@@ -1333,16 +1325,14 @@ class Multiplexer(object):
             os.close(self.session[sid]['fd'])
         except (KeyError, IOError, OSError):
             pass
-        if sid in self.session:
-            if 'fd' in self.session[sid]:
-                del self.session[sid]['fd']
+        if sid in self.session and 'fd' in self.session[sid]:
+            del self.session[sid]['fd']
         try:
             os.waitpid(self.session[sid]['pid'], 0)
         except (KeyError, IOError, OSError):
             pass
-        if sid in self.session:
-            if 'pid' in self.session[sid]:
-                del self.session[sid]['pid']
+        if sid in self.session and 'pid' in self.session[sid]:
+            del self.session[sid]['pid']
         self.session[sid]['state'] = 'dead'
         return True
 

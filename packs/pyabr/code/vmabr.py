@@ -86,24 +86,24 @@ if argv == []:
 
 ## @core/params-check ##
 
-if not (argv[0] == "kernel" or
-    argv[0] == "gui" or
-    argv[0] == "user" or
-    argv[0] == "login" or
-    argv[0] == "gui-splash" or
-    argv[0] == "gui-login" or
-    argv[0] == 'gui-enter' or
-    argv[0] == 'gui-desktop' or
-    argv[0] == "exec" ):
+if not argv[0] in [
+    "kernel",
+    "gui",
+    "user",
+    "login",
+    "gui-splash",
+    "gui-login",
+    'gui-enter',
+    'gui-desktop',
+    "exec",
+]:
     colors.show("params-check", "fail-start", "")
     colors.show("kernel", "stop", "")
     sys.exit(0)
-else:
-    if argv[0]=='kernel' or argv[0]=='gui':
-        if files.isfile ("/proc/0"):
-            colors.show("params-check", "fail-start", "")
-            colors.show("kernel", "stop", "")
-            sys.exit(0)
+if argv[0] in ['kernel', 'gui'] and files.isfile("/proc/0"):
+    colors.show("params-check", "fail-start", "")
+    colors.show("kernel", "stop", "")
+    sys.exit(0)
 
 colors.argv = argv[0] ## Set color argv
 
@@ -298,7 +298,7 @@ if app.check('desktop'):
 switch = process.processor() # Switch the process
 process.check (switch) # Check the switched process
 
-if switch == None:
+if switch is None:
     switch = 0
 
 files.write("/proc/info/sel","/proc/"+str(switch))
@@ -349,12 +349,10 @@ if not (argv[0]=='user' or argv[0]=='login'):
     if files.isfile('/pyabr-master.zip'): files.remove('/pyabr-master.zip')
     if files.isfile('/pyabr.zip'): files.remove('/pyabr.zip')
     if files.isdir('/pyabr-master'): files.removedirs('/pyabr-master')
-
 ## @core/kernel-info ##
 
     files.write("/proc/info/kname", kernel_name)
     files.write("/proc/info/kver", kernel_version)
-
 ## @core/system-info ##
 
     arch = platform.architecture()[0]
@@ -365,11 +363,7 @@ if not (argv[0]=='user' or argv[0]=='login'):
     py = sys.executable
     #mac = getmac.getmac.get_mac_address()
 
-    if argv[0] == "kernel":
-        interface = "CLI"
-    else:
-        interface = "GUI"
-
+    interface = "CLI" if argv[0] == "kernel" else "GUI"
     files.write("/proc/info/os", osname)
     files.write("/proc/info/arch", arch)
     files.write("/proc/info/os_su", os_user)
@@ -424,7 +418,7 @@ if argv[0]=="gui":
     files.write('/tmp/width', str(width))
     files.write('/tmp/height', str(height))
 
-    if not desktop == None:
+    if not desktop is None:
         w = importlib.import_module(desktop).Backend()
     else:
         colors.show('gui', 'fail-start', '')
@@ -456,7 +450,7 @@ if argv[0]=="gui-splash":
     files.write('/tmp/width', str(width))
     files.write('/tmp/height', str(height))
 
-    if not desktop == None:
+    if not desktop is None:
         w = importlib.import_module(desktop).Backend()
     else:
         colors.show('gui-splash', 'fail-start', '')
@@ -487,7 +481,7 @@ if argv[0]=="gui-login":
     files.write('/tmp/width', str(width))
     files.write('/tmp/height', str(height))
 
-    if not desktop == None:
+    if not desktop is None:
         w = importlib.import_module(desktop).Backend()
     else:
         colors.show('gui-login', 'fail-start', '')
@@ -532,7 +526,7 @@ if argv[0]=="gui-enter":
     files.write('/tmp/height', str(height))
 
     control.write_record('params', 'enter,{username}'.replace('{username}', argv[1]), '/etc/gui')
-    if not desktop == None:
+    if not desktop is None:
         w = importlib.import_module(desktop).Backend()
     else:
         colors.show('gui-enter', 'fail-start', '')
@@ -587,7 +581,7 @@ if argv[0]=="gui-desktop":
                          'desktop,{username},{password}'.replace('{username}', argv[1]).replace('{password}',
                                                                                                 argv[2]),
                          '/etc/gui')
-    if not desktop == None:
+    if not desktop is None:
         w = importlib.import_module(desktop).Backend()
     else:
         colors.show('gui-desktop', 'fail-start', '')

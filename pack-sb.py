@@ -41,13 +41,10 @@ if not os.path.isdir('sb'):
     os.mkdir('sb/root')
     os.mkdir('sb/etc')
 
-    f = open('sb/root/.xinitrc','w')
-    f.write('pyabr')
-    f.close()
-
-    f = open('sb/etc/issue.net', 'w')
-    f.write('Pyabr')
-    f.close()
+    with open('sb/root/.xinitrc','w') as f:
+        f.write('pyabr')
+    with open('sb/etc/issue.net', 'w') as f:
+        f.write('Pyabr')
 else:
     list.remove('sb')
 

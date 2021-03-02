@@ -326,12 +326,11 @@ class MainApp (QMainWindow):
         if files.isfile (f'/app/mirrors/{name}'):
             app.switch('paye')
             self.Env.RunApp('text', [res.get('@string/mex'), res.get('@string/mexm')])
-            app.switch('paye')
         else:
             files.write('/proc/info/msel',f'/app/mirrors/{name}')
             app.switch('paye')
             self.Env.RunApp('input', [res.get('@string/ml'), self.addm_x_])
-            app.switch('paye')
+        app.switch('paye')
 
     def addm_x_(self,link):
         if link.startswith('http://') or link.startswith('https://') and link.endswith ('.pa'):
@@ -384,11 +383,10 @@ class MainApp (QMainWindow):
         self.Env.RunApp('input', [res.get('@string/pname'), self.rem_x])
         app.switch('paye')
 
-    def rem_x (self,name):
+    def rem_x(self,name):
         if not files.isfile (f'/app/packages/{name}.manifest'):
             app.switch('paye')
             self.Env.RunApp('text', [res.get('@string/pwi'),res.get('@string/pwim').replace("{0}",name)])
-            app.switch('paye')
         else:
             System(f'paye rm {name}')
 
@@ -396,7 +394,7 @@ class MainApp (QMainWindow):
             self.Env.RunApp('paye', [None])
             app.switch('paye')
             self.Env.RunApp('text', [res.get('@string/rmx'),res.get('@string/rmxp').replace("{0}",name)])
-            app.switch('paye')
+        app.switch('paye')
 
     def down_(self):
         app.switch('paye')

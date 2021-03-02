@@ -52,7 +52,7 @@ class MainApp (QMainWindow):
         if password_hint=='Yes':
             self.leInput.setEchoMode(QLineEdit.Password)
 
-        if self.External[0]=='' or self.External[0]==None:
+        if self.External[0] == '' or self.External[0] is None:
             self.Widget.SetWindowTitle (res.get('@string/title'))
         else:
             self.Widget.SetWindowTitle (self.External[0])

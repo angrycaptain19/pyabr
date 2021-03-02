@@ -390,7 +390,7 @@ class Canvas(QLabel):
             p = QPainter(self.pixmap())
             p.setPen(QPen(self.active_color, 1))
 
-            for n in range(self.config['size'] * SPRAY_PAINT_N):
+            for _ in range(self.config['size'] * SPRAY_PAINT_N):
                 xo = random.gauss(0, self.config['size'] * SPRAY_PAINT_MULT)
                 yo = random.gauss(0, self.config['size'] * SPRAY_PAINT_MULT)
                 p.drawPoint(e.x() + xo, e.y() + yo)

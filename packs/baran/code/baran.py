@@ -289,12 +289,12 @@ class Splash (QMainWindow):
 
         ## Get app logo ##
         applogo = getdata('logo')
-        if not applogo == None:
+        if applogo is not None:
             self.setWindowIcon(QIcon(res.get(applogo)))
 
         ## Get app logo ##
         applogo = getdata('logo')
-        if not applogo==None:
+        if applogo is not None:
             self.setWindowIcon(QIcon(res.get(applogo)))
 
         # set font
@@ -308,7 +308,7 @@ class Splash (QMainWindow):
         color = getdata('splash.color')
 
         ## Set color ##
-        if not color==None:
+        if color is not None:
             variables.splash_color = color
 
         self.wb = QMainWindow()
@@ -320,10 +320,10 @@ class Splash (QMainWindow):
         height = getdata('height')
         autosize =getdata('autosize')
 
-        if not width == None  and not autosize=='Yes':
+        if width is not None and autosize != 'Yes':
             variables.width = int(width)
 
-        if not height == None and not autosize=='Yes':
+        if height is not None and autosize != 'Yes':
             variables.height = int(height)
 
         self.resize(variables.width, variables.height)
@@ -331,24 +331,16 @@ class Splash (QMainWindow):
         ## Set sides ##
         sides = getdata('sides')
 
-        if sides=='Yes':
-            variables.sides = True
-        else:
-            variables.sides = False
-
-        if variables.sides == False:
+        variables.sides = sides=='Yes'
+        if not variables.sides:
             self.setWindowFlag(Qt.FramelessWindowHint)
 
         ## Show ##
         ## Get data ##
         fullscreen = getdata('fullscreen')
 
-        if fullscreen == 'Yes':
-            variables.fullscreen = True
-        else:
-            variables.fullscreen = False
-
-        if variables.fullscreen == True:
+        variables.fullscreen = fullscreen == 'Yes'
+        if variables.fullscreen:
             self.showFullScreen()
         else:
             self.show()
@@ -361,16 +353,12 @@ class Splash (QMainWindow):
         self.wb.layout().addWidget (self.logo)
 
         ## Set logo ##
-        if not logo==None:
+        if logo is not None:
             self.logo.setIcon(QIcon(res.get(logo)))
 
         logo_size = getdata('splash.logo-size')
 
-        if not logo_size==None:
-            self.w = int(logo_size)
-        else:
-            self.w = 300
-
+        self.w = int(logo_size) if logo_size is not None else 300
         self.logo.setMaximumSize(self.w,self.w) ## Set size
         self.logo.setIconSize(QSize(self.w,self.w))
 
@@ -380,11 +368,7 @@ class Splash (QMainWindow):
 
         ## Run splash after showing backend ##
         timeout = getdata('splash.timeout')
-        if timeout==None:
-            variables.splash_timeout = 3000
-        else:
-            variables.splash_timeout = int(timeout)
-
+        variables.splash_timeout = 3000 if timeout is None else int(timeout)
         QTimer.singleShot(variables.splash_timeout, self.runLogin) ## Run login
 
 ## LoginW ##

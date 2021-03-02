@@ -32,7 +32,7 @@ class FileListView(QListView):
             format = max(format)
             if it.whatsThis().endswith(format):
                 logo = control.read_record(format + '.icon', '/etc/ext')
-                if not logo == None:
+                if logo is not None:
                     it.setIcon(QIcon(res.get(logo)))
                 else:
                     it.setIcon(QIcon(res.get(res.etc('roller','file-icon'))))

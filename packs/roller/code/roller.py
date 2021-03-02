@@ -36,7 +36,7 @@ class FileListView (QtWidgets.QListView):
             format = max(format)
             if it.whatsThis().endswith(format):
                 logo = control.read_record(format + '.icon', '/etc/ext')
-                if not logo == None:
+                if logo is not None:
                     it.setIcon(QtGui.QIcon(res.get(logo)))
                 else:
                     it.setIcon(QtGui.QIcon(res.get(res.etc("roller",'file-icon'))))
@@ -300,7 +300,7 @@ class FileListView (QtWidgets.QListView):
                 files.write ('/proc/info/fsel',self.item.whatsThis()) # Send File selected
 
 class MainApp (QtWidgets.QMainWindow):
-    def format (self,it,text):
+    def format(self,it,text):
         if os.path.isdir(self.dir + '/' + text):
             it.setIcon(QtGui.QIcon(res.get(res.etc("roller","folder-icon"))))
         else:
@@ -308,7 +308,7 @@ class MainApp (QtWidgets.QMainWindow):
             format = max(format)
             if it.whatsThis().endswith(format):
                 logo = control.read_record(format + '.icon', '/etc/ext')
-                if not logo==None:
+                if logo is not None:
                     it.setIcon(QtGui.QIcon(res.get(logo)))
                 else:
                     it.setIcon(QtGui.QIcon(res.get(res.etc("roller","file-icon"))))
@@ -326,11 +326,15 @@ class MainApp (QtWidgets.QMainWindow):
 
 
 
-        if not self.External == None:
-            if not self.External[0]==None:
-                if permissions.check(files.output(self.External[0]), "r", files.readall("/proc/info/su")):
-                    if files.isdir (files.output(self.External[0])):
-                        files.write('/proc/info/pwd',files.output(self.External[0]))
+        if (
+            self.External is not None
+            and self.External[0] is not None
+            and permissions.check(
+                files.output(self.External[0]), "r", files.readall("/proc/info/su")
+            )
+            and files.isdir(files.output(self.External[0]))
+        ):
+            files.write('/proc/info/pwd',files.output(self.External[0]))
 
         ## Menubar ##
 

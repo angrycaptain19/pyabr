@@ -54,15 +54,14 @@ class TextEdit(QTextEdit):
 
             for u in source.urls():
                 file_ext = splitext(str(u.toLocalFile()))
-                if u.isLocalFile() and file_ext in IMAGE_EXTENSIONS:
-                    image = QImage(u.toLocalFile())
-                    document.addResource(QTextDocument.ImageResource, u, image)
-                    cursor.insertImage(u.toLocalFile())
-
-                else:
+                if not u.isLocalFile() or file_ext not in IMAGE_EXTENSIONS:
                     # If we hit a non-image or non-local URL break the loop and fall out
                     # to the super call & let Qt handle it
                     break
+
+                image = QImage(u.toLocalFile())
+                document.addResource(QTextDocument.ImageResource, u, image)
+                cursor.insertImage(u.toLocalFile())
 
             else:
                 # If all were valid images, finish here.
@@ -362,7 +361,7 @@ class MainApp(QMainWindow):
         if self.Widget.WindowTitle() == '': self.Widget.SetWindowTitle(res.get('@string/untitled'))
 
     def file_save(self):
-        if not self.Widget.WindowTitle() == res.get('@string/untitled'):
+        if self.Widget.WindowTitle() != res.get('@string/untitled'):
             files.write(files.output(self.Widget.WindowTitle()), self.editor.toHtml())
         else:
             app.switch('lightword')
